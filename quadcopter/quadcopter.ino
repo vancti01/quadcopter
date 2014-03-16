@@ -1,6 +1,8 @@
 #include <Servo.h>
 
-Servo servoArray[4];
+//Servo servoArray[4];
+int motorArray[4];
+
 const int RED_PIN = 9;
 const int GREEN_PIN = 10;
 const int BLUE_PIN = 11;
@@ -16,16 +18,16 @@ const int br = 9;  //Back right
 /*Define controllers. Names are the same as motor constants
  with a C added afterword */
 
-Servo flc;
-Servo frc; 
-Servo blc;
-Servo brc;
+//Servo flc;
+//Servo frc; 
+//Servo blc;
+//Servo brc;
 
-//Current speed values of each servo
-int flc_s = 0;
-int frc_s = 0;
-int blc_s = 0;
-int brc_s = 0;
+//Current speed values of each motor
+int fl_s = 0;
+int fr_s = 0;
+int bl_s = 0;
+int br_s = 100;
 
 //TODO - Make sure the actual global variables are being accessed 
 int speedArray[4];
@@ -39,47 +41,48 @@ void setup()
   // pinMode(GREEN_PIN, OUTPUT);
   // pinMode(blUE_PIN, OUTPUT);
 
+    pinMode(br,OUTPUT);
 
-
-  flc.attach(fl);
-  frc.attach(fr);
-  blc.attach(bl);
-  brc.attach(br);
-
-  //Initialize array of motors. Use standard PWM pins
-  servoArray[0] = flc;
-  servoArray[1] = frc;
-  servoArray[2] = blc;
-  servoArray[3] = brc;
-
-  //Initialize array of motor speeds
-  speedArray[0] = flc_s;
-  speedArray[0] = frc_s;
-  speedArray[0] = blc_s;
-  speedArray[0] = brc_s;
-
-  for (int i=0; i<4; i++)
-  {
-
-    /*On each motor, write lowest throttle signal (0)
-     to ESC. This should be a 1 ms pulse.  Repeat this
-     every 20 ms. */
-
-    //NOTE - Timing may need to be adjusted to the specific ESC
-    for (int j=0; j<1000; j++)
-    {
-      servoArray[i].write(0); 
-      delay(20);
-    }
-
-    /*Write high throttle signal (180) for calibration */
-    for (int j=0; j<1000; j++)
-    {
-      servoArray[i].write(180); 
-      delay(20);
-    }
-
-  }
+//  flc.attach(fl);
+//  frc.attach(fr);
+//  blc.attach(bl);
+//  brc.attach(br);
+//
+//  //Initialize array of motors. Use standard PWM pins
+    motorArray[0] = fl;
+    motorArray[1] = fr;
+    motorArray[2] = bl;
+    motorArray[3] = br;
+//
+//  //Initialize array of motor speeds
+    speedArray[0] = fl_s;
+    speedArray[0] = fr_s;
+    speedArray[0] = bl_s;
+    speedArray[0] = br_s;
+    
+//
+//  for (int i=0; i<4; i++)
+//  {
+//
+//    /*On each motor, write lowest throttle signal (0)
+//     to ESC. This should be a 1 ms pulse.  Repeat this
+//     every 20 ms. */
+//
+//    //NOTE - Timing may need to be adjusted to the specific ESC
+//    for (int j=0; j<1000; j++)
+//    {
+//      servoArray[i].write(0); 
+//      delay(20);
+//    }
+//
+//    /*Write high throttle signal (180) for calibration */
+//    for (int j=0; j<1000; j++)
+//    {
+//      servoArray[i].write(180); 
+//      delay(20);
+//    }
+//
+//  }
 
 
   Serial.begin(9600);
@@ -94,13 +97,19 @@ void loop()
    */
 
   /* Write current set speed to each controller. Repeat every 2 ms. */
-  for (int k=0;k<4;k++)
-  {
-    servoArray[k].write(speedArray[k]);
-  }
-  delay(2);
+//  for (int k=0;k<4;k++)
+//  {
+//    servoArray[k].write(speedArray[k]);
+//  }
+//  delay(2);
 
 
+      digitalWrite(9, HIGH);
+      
+//    for(int i=0;i<4;i++)
+//    {
+//       setMotorSpeed(motorArray[i],speedArray[i]);
+//    }  
 
 }
 
@@ -111,11 +120,11 @@ void turnLeft()
 {
   //Lower power to left motors 
 
-  //setMotorSpeed(fl,100);
-  //setMotorSpeed(bl,100);
+  setMotorSpeed(fl,100);
+  setMotorSpeed(bl,100);
 
-  flc_s = 100;
-  blc_s = 100;
+//  fl_s = 100;
+//  bl_s = 100;
 
 }
 
@@ -126,11 +135,11 @@ void turnRight()
 
   hover();
 
-  //setMotorSpeed(fr,100);
-  //setMotorSpeed(br,100);
+  setMotorSpeed(fr,100);
+  setMotorSpeed(br,100);
   
-  frc_s = 100;
-  blc_s = 100;
+//  fr_s = 100;
+//  bl_s = 100;
 
 }
 
@@ -142,15 +151,15 @@ void hover()
   //This is the first fail-safe, use to prevent collisions.
 
   //Set all motors to middle speed
-  /*for (int i=0; i<4;i++)
-   {
-   setMotorSpeed(servoArray[i],150);
-   } */
+  for (int i=0; i<4;i++)
+  {
+   setMotorSpeed(motorArray[i],150);
+  }
    
-   for (int l;l<4;l++)
-   {
-      speedArray[l] = 140;
-   }
+//   for (int l;l<4;l++)
+//   {
+//      speedArray[l] = 140;
+//   }
 
 }
 
@@ -165,8 +174,10 @@ void forward()
    setMotorSpeed(fl,100);
    setMotorSpeed(fr,100); */
    
-  flc_s = 100;
-  frc_s = 100;
+  fl_s = 100;
+  fr_s = 100;
+  bl_s = 100;
+  br_s = 100;
   
 }
 void backward()
@@ -174,24 +185,24 @@ void backward()
   //Decrease power to front motors
 
   hover();
-  //   setMotorSpeed(bl,100);
-  //  setMotorSpeed(br,100);
-  blc_s = 100;
-  brc_s = 100;
+  setMotorSpeed(bl,100);
+  setMotorSpeed(br,100);
+  //bl_s = 100;
+  //br_s = 100;
 
 }
 
 
 
 
-void setMotorSpeed(Servo servo,int s)
+void setMotorSpeed(int m,int s)
 {
-  //DEPRECATED. Use Servo methods instead
+  
   //Set speed of motor 'motor' to value of s.
   //Speed values can only be 0-255 inclusive. Limit values to this range. 
-  if (s>180)
+  if (s>255)
   {
-    servo.write(180);
+    s = 255;
   }
   if (s<0)
   {
@@ -199,7 +210,7 @@ void setMotorSpeed(Servo servo,int s)
   }
 
   //QUESTION - Does this only work for one motor? how to handle concurrent motors?
-  //analogWrite(motor,s);
+  analogWrite(m,s);
 }
 
 
